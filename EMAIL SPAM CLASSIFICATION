@@ -1,0 +1,114 @@
+import pandas as pd
+import numpy as np
+data=pd.read_csv("spam.csv", encoding="latin-1")
+data.head()
+class message Unnamed: 2
+0 ham Go until jurong point, crazy.. Available only ... NaN
+\
+1 ham Ok lar... Joking wif u oni... NaN
+2 spam Free entry in 2 a wkly comp to win FA Cup fina... NaN
+3 ham U dun say so early hor... U c already then say... NaN
+4 ham Nah I don't think he goes to usf, he lives aro... NaN
+
+Unnamed: 3 Unnamed: 4
+0 NaN NaN
+1 NaN NaN
+2 NaN NaN
+3 NaN NaN
+4 NaN NaN
+data.columns
+Index(['class', 'message', 'Unnamed: 2', 'Unnamed: 3', 'Unnamed: 4'],
+dtype='object')
+data.drop(['Unnamed: 2', 'Unnamed: 3', 'Unnamed: 4'], axis=1,
+inplace=True)
+data.head()
+class message
+0 ham Go until jurong point, crazy.. Available only ...
+1 ham Ok lar... Joking wif u oni...
+2 spam Free entry in 2 a wkly comp to win FA Cup fina...
+3 ham U dun say so early hor... U c already then say...
+4 ham Nah I don't think he goes to usf, he lives aro...
+data['class']=data['class'].map({'ham':0, 'spam':1})
+data.head()
+class message
+0 0 Go until jurong point, crazy.. Available only ...
+1 0 Ok lar... Joking wif u oni...
+2 1 Free entry in 2 a wkly comp to win FA Cup fina...
+
+3 0 U dun say so early hor... U c already then say...
+4 0 Nah I don't think he goes to usf, he lives aro...
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.model_selection import train_test_split
+X=data['message']
+y=data['class']
+X.shape
+(5572,)
+y.shape
+(5572,)
+data.isnull().sum()
+class 0
+message 0
+dtype: int64
+cv=CountVectorizer()
+X=cv.fit_transform(X)
+x_train, x_test,y_train, y_test=train_test_split(X,y, test_size=0.2,
+random_state=42)
+x_train.shape
+(4457, 8672)
+x_test.shape
+(1115, 8672)
+from sklearn.naive_bayes import MultinomialNB
+model=MultinomialNB()
+model.fit(x_train, y_train)
+MultinomialNB()
+model.score(x_test, y_test)
+0.97847533632287
+msg="You Won 500$"
+data = [msg]
+vect = cv.transform(data).toarray()
+my_prediction = model.predict(vect)
+
+vect
+array([[0, 0, 0, ..., 0, 0, 0]], dtype=int64)
+import pickle
+pickle.dump(model, open('spam.pkl','wb'))
+model1 = pickle.load(open('spam.pkl','rb'))
+
+from win32com.client import Dispatch
+def speak(text):
+speak=Dispatch(("SAPI.SpVoice"))
+speak.Speak(text)
+def result(msg):
+data = [msg]
+vect = cv.transform(data).toarray()
+my_prediction = model1.predict(vect)
+if my_prediction[0]==1:
+speak("This is a Spam mail")
+print("This is a Spam mail")
+else:
+speak("This is not a Spam mail")
+print("This is not a Spam mail")
+import tkinter as tk
+root=tk.Tk()
+root.geometry("200x200")
+l2=tk.Label(root, text="Email Spam Classification Application")
+l2.pack()
+l1=tk.Label(root, text="Enter Your Message:")
+l1.pack()
+text=tk.Entry(root)
+text.pack()
+def result():
+data = [text.get()]
+vect = cv.transform(data).toarray()
+my_prediction = model1.predict(vect)
+if my_prediction[0]==1:
+speak("This is a Spam mail")
+print("This is a Spam mail")
+else:
+speak("This is not a Spam mail")
+print("This is not a Spam mail")
+B=tk.Button(root, text="Click", command=result)
+B.pack()
+root.mainloop()
+
+This is a Spam mail
